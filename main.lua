@@ -9,7 +9,6 @@ function love.load()
     code = generateCode(45)
     userinput = ""
     charsTyped = 1
-    lastkey = ""
 end
 
 function love.update(dt)
@@ -17,14 +16,18 @@ function love.update(dt)
 end
 
 function love.keypressed(key)
-    lastkey = key
-    
-    if key == "return" then
-        key = "\n"
-    elseif key == "space" then
-        key = " "
+    if key == "return" and string.sub(code, charsTyped, charsTyped) == "\n" then
+        userinput=userinput.."\n"
+        charsTyped=charsTyped+1
+        scripts=scripts+0.001
+    elseif key == "tab" and string.sub(code, charsTyped, charsTyped) == "\t" then
+        userinput=userinput.."\t"
+        charsTyped=charsTyped+1
+        scripts=scripts+0.001
     end
+end
 
+function love.textinput(key)
     if key == string.sub(code, charsTyped, charsTyped) then
         userinput=userinput..key
         charsTyped=charsTyped+1
@@ -45,7 +48,6 @@ function love.draw()
 
     --draw game menu
     love.graphics.rectangle("line", 20, 110, 130, love.graphics.getHeight()-130)
-    love.graphics.print("last key: "..lastkey, 40, 120)
 
     --draw code
     love.graphics.setColor(0, 0.2, 0)
