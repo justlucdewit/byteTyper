@@ -7,10 +7,30 @@ function love.load()
     scripts = 0
     bitcoins = 0
     code = generateCode(45)
+    userinput = ""
+    charsTyped = 1
+    lastkey = ""
 end
 
 function love.update(dt)
+
+end
+
+function love.keypressed(key)
+    lastkey = key
     
+    if key == "return" then
+        key = "\n"
+    elseif key == "space" then
+        key = " "
+    end
+
+    if key == string.sub(code, charsTyped, charsTyped) then
+        userinput=userinput..key
+        charsTyped=charsTyped+1
+        scripts=scripts+0.001
+    end
+
 end
 
 function love.draw()
@@ -18,17 +38,22 @@ function love.draw()
     love.graphics.setColor(0, 1, 0)
     love.graphics.print("scripts:  "..scripts.."kb", 40, 30)
     love.graphics.print("bitcoins: "..bitcoins.."bc", 40, 50)
-    love.graphics.rectangle("line", 20, 20, 120, 70)
+    love.graphics.rectangle("line", 20, 20, 130, 70)
 
     --draw IDE
     love.graphics.rectangle("line", 160, 20, love.graphics.getWidth()-180, love.graphics.getHeight()-40)
 
     --draw game menu
-    love.graphics.rectangle("line", 20, 110, 120, love.graphics.getHeight()-130)
+    love.graphics.rectangle("line", 20, 110, 130, love.graphics.getHeight()-130)
+    love.graphics.print("last key: "..lastkey, 40, 120)
 
     --draw code
     love.graphics.setColor(0, 0.2, 0)
     love.graphics.print(code, 180, 40)
+    
+    --draw already written code
+    love.graphics.setColor(0, 1, 0)
+    love.graphics.print(userinput, 180, 40)
 end 
 
 function generateCode(linesAllowed)
