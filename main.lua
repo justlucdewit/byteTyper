@@ -1,13 +1,16 @@
 function love.load()
+    math.randomseed(os.time())
+    math.random();math.random();math.random();math.random();math.random()
+
     love.window.setTitle("byteTyper")
 
     scripts = 0
     bitcoins = 0
-    code = "let foo = \"random generation!!!\";\nfunction foo (){\n\tlet mao = \"stupid af\"\n}"
+    code = generateCode(45)
 end
 
 function love.update(dt)
-     
+    
 end
 
 function love.draw()
@@ -24,5 +27,42 @@ function love.draw()
     love.graphics.rectangle("line", 20, 110, 120, love.graphics.getHeight()-130)
 
     --draw code
+    love.graphics.setColor(0, 0.2, 0)
     love.graphics.print(code, 180, 40)
 end 
+
+function generateCode(linesAllowed)
+    local linesGenerated = 0
+    local variableNames = {"foo", "bar", "i", "n", "num", "x", "y", "dt", "delta", "arr", "placeHolder", "a", "b", "j", "k", "l", "z", "depth", "length", "empty", "score", "itterations"}
+    local functionNames = {"func", "encrypt", "decrypt", "generate", "applyAlg", "crash", "hack", "connect"}
+    local strings = {"default", "score: %d", "line", "232.255.114.240", "localhost", "wifi", "cracked", "title", "connected..."}
+
+    local codeSegments = {string.format("let %s = %d;", getRandom(variableNames), math.random(1000)), 
+                    string.format("let %s = \"%s\";", getRandom(variableNames), getRandom(strings)),
+                    string.format("console.log(%s);", getRandom(variableNames)),
+                    string.format("console.log(\"%s\");", getRandom(strings)),
+                    string.format("function %s(%s, %s){\n\treturn %s+%s/2;\n}", getRandom(functionNames), getRandom(variableNames), getRandom(variableNames), getRandom(variableNames), getRandom(variableNames))
+                }
+    local retcode = ""
+
+    while true do
+        local newsegment = getRandom(codeSegments)
+        newsegment = newsegment.."\n\n"
+        if linesGenerated+numOfLines(newsegment) > linesAllowed then
+            break
+        end
+
+        linesGenerated = linesGenerated + numOfLines(newsegment)
+        retcode = retcode..newsegment
+    end
+    return retcode
+end
+
+function numOfLines(str)
+    local _, count = str:gsub("\n", "\n")
+    return count+1
+end
+
+function getRandom(arr)
+    return arr[math.random(#arr)]
+end
