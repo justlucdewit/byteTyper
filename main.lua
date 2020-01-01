@@ -9,6 +9,8 @@ function love.load()
     code = generateCode(45)
     userinput = ""
     charsTyped = 1
+    line = 0
+    col = 0
 end
 
 function love.update(dt)
@@ -37,6 +39,9 @@ function love.textinput(key)
 end
 
 function love.draw()
+    local width = love.graphics.getWidth()
+    local height = love.graphics.getHeight()
+
     --draw status box
     love.graphics.setColor(0, 1, 0)
     love.graphics.print("scripts:  "..scripts.."kb", 40, 30)
@@ -44,10 +49,10 @@ function love.draw()
     love.graphics.rectangle("line", 20, 20, 130, 70)
 
     --draw IDE
-    love.graphics.rectangle("line", 160, 20, love.graphics.getWidth()-180, love.graphics.getHeight()-40)
+    love.graphics.rectangle("line", 160, 20, width-180, height-80)
 
     --draw game menu
-    love.graphics.rectangle("line", 20, 110, 130, love.graphics.getHeight()-130)
+    love.graphics.rectangle("line", 20, 110, 130, height-170)
 
     --draw code
     love.graphics.setColor(0, 0.2, 0)
@@ -56,6 +61,11 @@ function love.draw()
     --draw already written code
     love.graphics.setColor(0, 1, 0)
     love.graphics.print(userinput, 180, 40)
+
+    --draw status bar
+    love.graphics.rectangle("line", 20, height-50, width-40, 40)
+    love.graphics.print("00:00 0-0-0000", 30, height-40)--time
+    love.graphics.print("Ln "..line..", Col, "..col, width-120, height-40)--cursor location
 end 
 
 function generateCode(linesAllowed)
