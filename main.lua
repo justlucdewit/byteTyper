@@ -22,10 +22,13 @@ function love.keypressed(key)
         userinput=userinput.."\n"
         charsTyped=charsTyped+1
         scripts=scripts+0.001
+        col = 0
+        line=line+1
     elseif key == "tab" and string.sub(code, charsTyped, charsTyped) == "\t" then
         userinput=userinput.."\t"
         charsTyped=charsTyped+1
         scripts=scripts+0.001
+        col=col+1
     end
 end
 
@@ -34,6 +37,7 @@ function love.textinput(key)
         userinput=userinput..key
         charsTyped=charsTyped+1
         scripts=scripts+0.001
+        col = col+1
     end
 
 end
@@ -64,7 +68,7 @@ function love.draw()
 
     --draw status bar
     love.graphics.rectangle("line", 20, height-50, width-40, 40)
-    love.graphics.print("00:00 0-0-0000", 30, height-40)--time
+    love.graphics.print(os.date("%H:%M:%S %d-%m-%Y"), 30, height-40)--time
     love.graphics.print("Ln "..line..", Col, "..col, width-120, height-40)--cursor location
 end 
 
