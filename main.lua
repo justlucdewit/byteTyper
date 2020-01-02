@@ -11,6 +11,9 @@ function love.load()
     charsTyped = 1
     line = 0
     col = 0
+    
+    isInMenu = true
+    menupos = 1
 end
 
 function love.update(dt)
@@ -18,28 +21,51 @@ function love.update(dt)
 end
 
 function love.keypressed(key)
-    if key == "return" and string.sub(code, charsTyped, charsTyped) == "\n" then
-        userinput=userinput.."\n"
-        charsTyped=charsTyped+1
-        scripts=scripts+0.001
-        col = 0
-        line=line+1
-    elseif key == "tab" and string.sub(code, charsTyped, charsTyped) == "\t" then
-        userinput=userinput.."\t"
-        charsTyped=charsTyped+1
-        scripts=scripts+0.001
-        col=col+1
+    if not isInMenu then--IDE controlls
+        if key == "return" and string.sub(code, charsTyped, charsTyped) == "\n" then
+            userinput=userinput.."\n"
+            charsTyped=charsTyped+1
+            scripts=scripts+0.001
+            col = 0
+            line=line+1
+        elseif key == "tab" and string.sub(code, charsTyped, charsTyped) == "\t" then
+            userinput=userinput.."\t"
+            charsTyped=charsTyped+1
+            scripts=scripts+0.001
+            col=col+1
+        elseif key == "escape" then
+            isInMenu = true
+            menupos = 1
+        end
+    else--menu controlls
+        if key == "return" then
+            if menupos == 1 then
+                isInMenu = false
+                menupos = -1
+            end
+        elseif key == "up" then
+            menupos = menupos - 1
+            if menupos < 1 then
+                menupos = 1
+            end
+        elseif key == "down" then
+            menupos = menupos + 1
+            if menupos > 5 then
+                menupos = 5
+            end
+        end
     end
 end
 
 function love.textinput(key)
-    if key == string.sub(code, charsTyped, charsTyped) then
-        userinput=userinput..key
-        charsTyped=charsTyped+1
-        scripts=scripts+0.001
-        col = col+1
+    if not isInMenu then
+        if key == string.sub(code, charsTyped, charsTyped) then
+            userinput=userinput..key
+            charsTyped=charsTyped+1
+            scripts=scripts+0.001
+            col = col+1
+        end
     end
-
 end
 
 function love.draw()
@@ -57,6 +83,21 @@ function love.draw()
 
     --draw game menu
     love.graphics.rectangle("line", 20, 110, 130, height-170)
+    
+    setMenuColor(1)
+    love.graphics.print("edit", 40, 130)
+    
+    setMenuColor(2)
+    love.graphics.print("sell", 40, 150)
+
+    setMenuColor(3)
+    love.graphics.print("shop", 40, 170)
+
+    setMenuColor(4)
+    love.graphics.print("save", 40, 190)
+
+    setMenuColor(5)
+    love.graphics.print("exit", 40, 210)
 
     --draw code
     love.graphics.setColor(0, 0.2, 0)
@@ -78,15 +119,16 @@ function generateCode(linesAllowed)
     local functionNames = {"func", "encrypt", "decrypt", "generate", "applyAlg", "crash", "hack", "connect"}
     local strings = {"default", "score: %d", "line", "232.255.114.240", "localhost", "wifi", "cracked", "title", "connected..."}
 
-    local codeSegments = {string.format("let %s = %d;", getRandom(variableNames), math.random(1000)), 
+    local retcode = ""
+
+    while true do
+            local codeSegments = {string.format("let %s = %d;", getRandom(variableNames), math.random(1000)), 
                     string.format("let %s = \"%s\";", getRandom(variableNames), getRandom(strings)),
                     string.format("console.log(%s);", getRandom(variableNames)),
                     string.format("console.log(\"%s\");", getRandom(strings)),
                     string.format("function %s(%s, %s){\n\treturn %s+%s/2;\n}", getRandom(functionNames), getRandom(variableNames), getRandom(variableNames), getRandom(variableNames), getRandom(variableNames))
                 }
-    local retcode = ""
 
-    while true do
         local newsegment = getRandom(codeSegments)
         newsegment = newsegment.."\n\n"
         if linesGenerated+numOfLines(newsegment) > linesAllowed then
@@ -102,6 +144,14 @@ end
 function numOfLines(str)
     local _, count = str:gsub("\n", "\n")
     return count+1
+end
+
+function setMenuColor(n)
+    if n == menupos then
+        love.graphics.setColor(0, 1, 0)
+    else
+        love.graphics.setColor(0, 0.2, 0)
+    end
 end
 
 function getRandom(arr)
