@@ -16,6 +16,15 @@ function love.load()
     isInMenu = true
     menupos = 1
 
+    popup = false
+    popupmsg = ""
+    popupevt = nothing
+    popupmargin = 100
+    popuppos = 1
+end
+
+function nothing()
+    return 0
 end
 
 function love.update(dt)
@@ -28,7 +37,7 @@ function love.update(dt)
 end
 
 function love.keypressed(key)
-    if not isInMenu then--IDE controlls
+    if not isInMenu and not popup then--IDE controlls
         if key == "return" and string.sub(code, charsTyped, charsTyped) == "\n" then
             userinput=userinput.."\n"
             charsTyped=charsTyped+1
@@ -44,15 +53,23 @@ function love.keypressed(key)
             isInMenu = true
             menupos = 1
         end
-    else--menu controlls
+    elseif not popup then--menu controlls
         if key == "return" then
-            if menupos == 1 then
+            if menupos == 1 then--edit
                 isInMenu = false
                 menupos = -1
-            elseif menupos == 2 then
+            elseif menupos == 2 then--sell
                 bitcoins = bitcoins+ scripts*bitcoinworth
                 scripts = 0
                 bitcoinworth = math.random(0.8, 1.2)
+            elseif menupos == 3 then--shop
+                
+            elseif menupos == 4 then--save
+                
+            elseif menupos == 5 then--exit
+                popupmsg = "are you sure you want to quit?"
+                popup = true
+                --love.event.quit()
             end
         elseif key == "up" then
             menupos = menupos - 1
@@ -63,6 +80,18 @@ function love.keypressed(key)
             menupos = menupos + 1
             if menupos > 5 then
                 menupos = 5
+            end
+        end
+    else --popup controlls
+        if key == "right" then
+            popuppos = 2
+        elseif key == "left" then
+            popuppos = 1
+        elseif key == "return" then
+            if popuppos == 1 then
+                love.event.quit()
+            else
+                popup = false
             end
         end
     end
@@ -126,6 +155,22 @@ function love.draw()
     love.graphics.rectangle("line", 20, height-50, width-40, 40)
     love.graphics.print(os.date("%H:%M:%S %d-%m-%Y"), 30, height-40)--time
     love.graphics.print("Ln "..line..", Col, "..col, width-120, height-40)--cursor location
+
+    if popup then--draw popup
+        love.graphics.setColor(0, 0, 0, 0.8)
+        love.graphics.rectangle("fill", popupmargin, popupmargin, width-popupmargin*2, height-popupmargin*2)
+        love.graphics.setColor(1, 0, 0)
+        love.graphics.rectangle("line", popupmargin, popupmargin, width-popupmargin*2, height-popupmargin*2)
+        love.graphics.setColor(0, 1, 0)
+        love.graphics.print(popupmsg, popupmargin+20, popupmargin+20)
+
+        --popup buttons
+        setPopupColor(1)
+        love.graphics.print("[ok]", popupmargin+20, height-popupmargin-20)
+        
+        setPopupColor(2)
+        love.graphics.print("[cancel]", popupmargin+80, height-popupmargin-20)
+    end
 end 
 
 function generateCode(linesAllowed)
@@ -163,6 +208,14 @@ end
 
 function setMenuColor(n)
     if n == menupos then
+        love.graphics.setColor(0, 1, 0)
+    else
+        love.graphics.setColor(0, 0.2, 0)
+    end
+end
+
+function setPopupColor(n)
+    if n == popuppos then
         love.graphics.setColor(0, 1, 0)
     else
         love.graphics.setColor(0, 0.2, 0)
