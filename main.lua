@@ -6,6 +6,7 @@ function love.load()
 
     scripts = 0
     bitcoins = 0
+    bitcoinworth = math.random(0.8, 1.2)
     code = generateCode(45)
     userinput = ""
     charsTyped = 1
@@ -14,10 +15,16 @@ function love.load()
     
     isInMenu = true
     menupos = 1
+
 end
 
 function love.update(dt)
-
+    if charsTyped == #code-1 then
+        --completed the script
+        userinput = ""
+        code = generateCode(45)
+        charsTyped = 1
+    end
 end
 
 function love.keypressed(key)
@@ -42,6 +49,10 @@ function love.keypressed(key)
             if menupos == 1 then
                 isInMenu = false
                 menupos = -1
+            elseif menupos == 2 then
+                bitcoins = bitcoins+ scripts*bitcoinworth
+                scripts = 0
+                bitcoinworth = math.random(0.8, 1.2)
             end
         elseif key == "up" then
             menupos = menupos - 1
@@ -105,7 +116,11 @@ function love.draw()
     
     --draw already written code
     love.graphics.setColor(0, 1, 0)
-    love.graphics.print(userinput, 180, 40)
+    if os.time()%2 == 0 then
+        love.graphics.print(userinput, 180, 40)
+    else
+        love.graphics.print(userinput.."_", 180, 40)
+    end
 
     --draw status bar
     love.graphics.rectangle("line", 20, height-50, width-40, 40)
