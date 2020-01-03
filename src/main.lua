@@ -1,5 +1,3 @@
-local codeGen = require "codeGen"
-
 function love.load()
     math.randomseed(os.time())
     math.random();math.random();math.random();math.random();math.random()
@@ -9,7 +7,7 @@ function love.load()
     scripts = 0
     bitcoins = 0
     bitcoinworth = math.random(0.8, 1.2)
-    code = codeGen.generate(45)
+    code = generateCode(45)
     userinput = ""
     charsTyped = 1
     line = 0
@@ -35,7 +33,7 @@ function love.update(dt)
     if charsTyped == #code-1 then
         --completed the script
         userinput = ""
-        code = codeGen.generate(45)
+        code = generateCode(45)
         charsTyped = 1
     end
 end
@@ -176,6 +174,39 @@ function love.draw()
     end
 end 
 
+function generateCode(linesAllowed)
+    local linesGenerated = 0
+    local variableNames = {"foo", "bar", "i", "n", "num", "x", "y", "dt", "delta", "arr", "placeHolder", "a", "b", "j", "k", "l", "z", "depth", "length", "empty", "score", "itterations"}
+    local functionNames = {"func", "encrypt", "decrypt", "generate", "applyAlg", "crash", "hack", "connect"}
+    local strings = {"default", "score: %d", "line", "232.255.114.240", "localhost", "wifi", "cracked", "title", "connected..."}
+
+    local retcode = ""
+
+    while true do
+            local codeSegments = {string.format("let %s = %d;", getRandom(variableNames), math.random(1000)), 
+                    string.format("let %s = \"%s\";", getRandom(variableNames), getRandom(strings)),
+                    string.format("console.log(%s);", getRandom(variableNames)),
+                    string.format("console.log(\"%s\");", getRandom(strings)),
+                    string.format("function %s(%s, %s){\n\treturn %s+%s/2;\n}", getRandom(functionNames), getRandom(variableNames), getRandom(variableNames), getRandom(variableNames), getRandom(variableNames))
+                }
+
+        local newsegment = getRandom(codeSegments)
+        newsegment = newsegment.."\n\n"
+        if linesGenerated+numOfLines(newsegment) > linesAllowed then
+            break
+        end
+
+        linesGenerated = linesGenerated + numOfLines(newsegment)
+        retcode = retcode..newsegment
+    end
+    return retcode
+end
+
+function numOfLines(str)
+    local _, count = str:gsub("\n", "\n")
+    return count+1
+end
+
 function setMenuColor(n)
     if n == menupos then
         love.graphics.setColor(0, 1, 0)
@@ -190,4 +221,8 @@ function setPopupColor(n)
     else
         love.graphics.setColor(0, 0.2, 0)
     end
+end
+
+function getRandom(arr)
+    return arr[math.random(#arr)]
 end
